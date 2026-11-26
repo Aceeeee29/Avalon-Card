@@ -1,0 +1,18 @@
+{
+  "rules": {
+    "rooms": {
+      "$room": {
+        ".read": true,
+        ".write": true,
+        ".validate": "newData.hasChildren(['host', 'phase'])",
+        "phase": { ".validate": "newData.val() === 'lobby' || newData.val() === 'voting'" },
+        "votes": {
+          "$pid": { ".validate": "newData.val() === 'approve' || newData.val() === 'reject'" }
+        },
+        "players": {
+          "$pid": { "name": { ".validate": "newData.isString() && newData.val().length <= 16" } }
+        }
+      }
+    }
+  }
+}

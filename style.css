@@ -1,0 +1,120 @@
+:root { --green: #5cb878; --red: #d0564c; --gold: #c9a24b; }
+* { box-sizing: border-box; margin: 0; }
+body { background: #111; color: #eee; font-family: Georgia, "Times New Roman", serif; }
+
+.app { min-height: 100dvh; max-width: 640px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; }
+
+[hidden] { display: none !important; }
+
+.top { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: .85rem; color: #999; }
+.top-right { display: flex; gap: 6px; }
+.top button { font: inherit; color: #ccc; background: none; border: 1px solid #444; border-radius: 6px; padding: 6px 10px; cursor: pointer; }
+.top button:hover { border-color: var(--gold); color: #fff; }
+.top .chip { font-weight: 700; letter-spacing: .25em; color: var(--gold); border-color: #5a4a22; }
+
+.game { flex: 1; display: flex; flex-direction: column; }
+
+/* home + lobby */
+.home, .lobby { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 24px 0; text-align: center; }
+.logo { font-family: "Cinzel", Georgia, serif; color: var(--gold); letter-spacing: .14em; text-transform: uppercase; font-size: clamp(1.8rem, 8vw, 2.6rem); }
+.box { width: min(100%, 360px); display: flex; flex-direction: column; gap: 10px; padding: 16px; border: 1px solid #3a3224; border-radius: 12px; background: #17150f; }
+.box h2, .lobby h2 { font-size: .95rem; letter-spacing: .15em; text-transform: uppercase; color: #aaa; font-weight: 400; }
+input[type=text], input:not([type]) { font: inherit; font-size: 1rem; color: #eee; background: #0d0c0a; border: 1px solid #443a26; border-radius: 8px; padding: 12px; text-align: center; width: 100%; }
+input:focus { outline: 2px solid var(--gold); outline-offset: 1px; }
+#joinCode { letter-spacing: .5em; text-transform: uppercase; font-weight: 700; }
+button.primary { font: 700 1rem Georgia, serif; letter-spacing: .08em; color: #1a140a; background: linear-gradient(#e0c577, #b08a35); border: 0; border-radius: 8px; padding: 12px; cursor: pointer; }
+button.primary:disabled { opacity: .4; cursor: default; }
+button.link { font: inherit; background: none; border: 0; color: #9d916f; text-decoration: underline; cursor: pointer; padding: 4px; }
+.note { color: #8a8272; font-size: .9rem; }
+.msg { color: var(--red); min-height: 1.2em; font-size: .9rem; }
+
+.bigcode { font: 800 clamp(2.8rem, 16vw, 4.5rem) "Cinzel", Georgia, serif; letter-spacing: .2em; padding-left: .2em; color: var(--gold); }
+.plist { list-style: none; padding: 0; width: min(100%, 360px); display: flex; flex-direction: column; gap: 6px; }
+.plist li { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #17150f; border: 1px solid #2e2819; border-radius: 8px; text-align: left; }
+.plist .pname { flex: 1; }
+.plist em { font-size: .7rem; color: var(--gold); margin-left: 6px; text-transform: uppercase; letter-spacing: .1em; font-style: normal; }
+.plist .empty { justify-content: center; color: #666; }
+.dot { width: 9px; height: 9px; border-radius: 50%; background: #555; }
+.dot.on { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.x { font-size: 1.2rem; line-height: 1; color: #999; background: none; border: 0; cursor: pointer; padding: 2px 8px; }
+.x:hover { color: var(--red); }
+.check { display: flex; align-items: center; gap: 8px; color: #bbb; font-size: .9rem; cursor: pointer; }
+.check input { width: 18px; height: 18px; accent-color: var(--gold); }
+#startBtn { width: min(100%, 360px); }
+
+.result-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; padding: 12px 0; }
+.counts { display: flex; gap: 32px; font-size: 1.2rem; }
+.counts b { font-size: 1.5em; margin-left: 6px; }
+.g b { color: var(--green); } .r b { color: var(--red); }
+.sub { color: #888; }
+
+/* ---------- the card (sized with font-size) ---------- */
+.card {
+  --noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012 .016' numOctaves='4' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 .35  0 0 0 0 .28  0 0 0 0 .17  2.2 0 0 0 -.75'/%3E%3C/filter%3E%3Crect width='300' height='400' filter='url(%23n)'/%3E%3C/svg%3E");
+  position: relative;
+  width: 10em; height: 14em;
+  display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+  padding: 1.4em 0 1.6em;
+  border: 0; border-radius: 1.1em;
+  background:
+    var(--noise),
+    radial-gradient(ellipse at 30% 15%, #e3d6ba, transparent 60%),
+    linear-gradient(165deg, #c9b895, #a8966f);
+  background-size: cover;
+  box-shadow: 0 .7em 1.4em #000a, inset 0 0 0 .08em #ffffff30, inset 0 0 2em #5a4a2a66;
+  font-family: "Cinzel", Georgia, serif;
+  font-size: 15px;
+  cursor: default;
+}
+
+/* engraved metal lettering */
+.label {
+  font-size: 1.45em; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+  color: #8b7a58;
+  text-shadow: 0 .06em 0 #f4ead0, 0 -.05em .04em #2a1f0c, .05em .1em .12em #0006;
+}
+
+/* textured stone */
+.stone {
+  position: relative; display: block;
+  width: 7.2em; aspect-ratio: 1; border-radius: 50%;
+  box-shadow: 0 .8em 1.2em #0007;
+}
+.stone::after {
+  content: ""; position: absolute; inset: 0; border-radius: 50%;
+  background: var(--pebbles); mix-blend-mode: multiply; opacity: .9;
+}
+.approve .stone {
+  background: radial-gradient(circle at 38% 30%, #fffbe9 0%, #ebdfc0 40%, #c4b48b 80%, #9d8c64 100%);
+  --pebbles: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.11' numOctaves='2' seed='2'/%3E%3CfeColorMatrix values='0 0 0 0 .6  0 0 0 0 .5  0 0 0 0 .34  4 0 0 0 -1.7'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23p)'/%3E%3C/svg%3E");
+}
+.reject .stone {
+  background: radial-gradient(circle at 38% 30%, #5a5a5a 0%, #2c2c2c 40%, #151515 80%, #0a0a0a 100%);
+  --pebbles: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.11' numOctaves='2' seed='5'/%3E%3CfeColorMatrix values='0 0 0 0 .02  0 0 0 0 .02  0 0 0 0 .02  4 0 0 0 -1.9'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23p)'/%3E%3C/svg%3E");
+}
+
+/* ---------- result stage (big cards) ---------- */
+.stage { position: relative; width: 22em; height: 14.6em; font-size: min(24px, 3.7vh, 3.9vw); }
+.stage .card {
+  position: absolute; left: 50%; top: 0; font-size: 1em; margin-left: -5em;
+  transition: transform .5s cubic-bezier(.3,1.2,.4,1), opacity .35s;
+}
+.stage[data-show="both"] .reject  { transform: translateX(-30%) rotate(-6deg); }
+.stage[data-show="both"] .approve { transform: translateX(30%)  rotate(5deg);  z-index: 2; }
+.stage[data-show="approve"] .approve { transform: scale(1.06); z-index: 2; }
+.stage[data-show="approve"] .reject  { transform: translateX(-70%) rotate(-10deg) scale(.9); opacity: 0; }
+.stage[data-show="reject"] .reject   { transform: scale(1.06); z-index: 2; }
+.stage[data-show="reject"] .approve  { transform: translateX(70%) rotate(10deg) scale(.9); opacity: 0; }
+.stage[data-show="approve"] .approve { box-shadow: 0 0 2.5em #5cb87888, 0 .7em 1.4em #000a, inset 0 0 2em #5a4a2a66; }
+.stage[data-show="reject"] .reject   { box-shadow: 0 0 2.5em #d0564c88, 0 .7em 1.4em #000a, inset 0 0 2em #5a4a2a66; }
+
+/* ---------- vote buttons (smaller cards) ---------- */
+.buttons { display: flex; gap: 14px; justify-content: center; padding-bottom: 8px; font-size: min(15px, 2.1vh); }
+.buttons .card { flex: none; font-size: inherit; cursor: pointer; transition: transform .15s, filter .2s; }
+.buttons .approve { transform: rotate(2deg); }
+.buttons .reject  { transform: rotate(-2deg); }
+.buttons .card:hover:not(:disabled) { transform: rotate(0) translateY(-.4em); }
+.buttons .card:active:not(:disabled) { transform: scale(.96); }
+.buttons .card:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+.buttons .card:disabled { filter: grayscale(.6) brightness(.5); cursor: default; }
+.buttons .card.chosen:disabled { filter: none; box-shadow: 0 0 0 3px var(--gold), 0 .7em 1.4em #000a; }

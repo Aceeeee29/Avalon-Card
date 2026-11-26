@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Avalon Vote</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app" id="app">
+
+    <!-- room header (hidden on home) -->
+    <header class="top" id="header" hidden>
+      <button class="chip" id="codeChip" type="button" title="Copy invite link"></button>
+      <div class="top-right">
+        <button id="roundBtn" type="button" hidden>New round</button>
+        <button id="lobbyBtn" type="button" hidden>Lobby</button>
+        <button id="exitBtn" type="button">Leave</button>
+      </div>
+    </header>
+
+    <!-- HOME -->
+    <section class="home" id="home">
+      <h1 class="logo">Avalon Vote</h1>
+      <p class="note" id="modeNote"></p>
+
+      <div class="box">
+        <h2>Create a room</h2>
+        <input id="hostName" placeholder="Your name (empty = shared board only)" maxlength="16" autocomplete="off">
+        <button class="primary" id="createBtn" type="button">Create room</button>
+      </div>
+
+      <div class="box">
+        <h2>Join a room</h2>
+        <input id="joinCode" placeholder="Room code" maxlength="4" autocapitalize="characters" autocomplete="off">
+        <input id="joinName" placeholder="Your name" maxlength="16" autocomplete="off">
+        <button class="primary" id="joinBtn" type="button">Join</button>
+        <button class="link" id="watchBtn" type="button">Just watch (board)</button>
+      </div>
+      <p class="msg" id="homeMsg"></p>
+    </section>
+
+    <!-- LOBBY -->
+    <section class="lobby" id="lobby" hidden>
+      <p class="note">Room code</p>
+      <div class="bigcode" id="bigCode"></div>
+      <button class="link" id="copyBtn" type="button">Copy invite link</button>
+      <h2 id="playersTitle">Players</h2>
+      <ul class="plist" id="playerList"></ul>
+      <label class="check" id="secretRow"><input type="checkbox" id="secretChk"> Hide votes until everyone has voted</label>
+      <button class="primary" id="startBtn" type="button">Start vote</button>
+      <p class="note" id="waitMsg">Waiting for the host to start…</p>
+    </section>
+
+    <!-- GAME -->
+    <section class="game" id="game" hidden>
+      <section class="result-area">
+        <div class="stage" id="stage" data-show="both" aria-live="polite">
+          <div class="card reject"><span class="label">Reject</span><i class="stone"></i></div>
+          <div class="card approve"><span class="label">Approve</span><i class="stone"></i></div>
+        </div>
+        <p class="counts"><span class="g">Approve <b id="a">0</b></span><span class="r">Reject <b id="r">0</b></span></p>
+        <p class="sub" id="sub">0 / 0 voted</p>
+        <p class="note" id="status"></p>
+      </section>
+
+      <div class="buttons" id="buttons">
+        <button class="card approve" id="approve" type="button" aria-label="Approve"><span class="label">Approve</span><i class="stone"></i></button>
+        <button class="card reject" id="reject" type="button" aria-label="Reject"><span class="label">Reject</span><i class="stone"></i></button>
+      </div>
+    </section>
+
+  </main>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
