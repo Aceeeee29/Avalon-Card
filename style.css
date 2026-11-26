@@ -24,6 +24,7 @@ input:focus { outline: 2px solid var(--gold); outline-offset: 1px; }
 #joinCode { letter-spacing: .5em; text-transform: uppercase; font-weight: 700; }
 button.primary { font: 700 1rem Georgia, serif; letter-spacing: .08em; color: #1a140a; background: linear-gradient(#e0c577, #b08a35); border: 0; border-radius: 8px; padding: 12px; cursor: pointer; }
 button.primary:disabled { opacity: .4; cursor: default; }
+.msg:not(:empty) { color: var(--red); }
 button.link { font: inherit; background: none; border: 0; color: #9d916f; text-decoration: underline; cursor: pointer; padding: 4px; }
 .note { color: #8a8272; font-size: .9rem; }
 .msg { color: var(--red); min-height: 1.2em; font-size: .9rem; }

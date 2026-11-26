@@ -40,13 +40,18 @@ function playersOf(r) {
 
 // ---------- boot ----------
 async function boot() {
+  const btns = [$('createBtn'), $('joinBtn')];
+  btns.forEach((b) => { b.disabled = true; });
+  homeMsg('Connecting…');
   try {
     db = await createDb();
   } catch (e) {
-    homeMsg('Could not load Firebase. Check firebase-config.js and your connection.');
+    homeMsg(`Could not connect to Firebase (${e.message}). Check your connection, then reload.`);
     console.error(e);
     return;
   }
+  homeMsg('');
+  btns.forEach((b) => { b.disabled = false; });
   $('modeNote').textContent = db.mode === 'local'
     ? 'Demo mode: Firebase is not configured, so rooms only work between tabs on this device.'
     : '';
