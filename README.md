@@ -23,7 +23,7 @@ then visit `http://localhost:5173`. With no Firebase config the app runs in **de
 
 ## How a game works
 
-- **Host** creates a room and shares the 4-letter code or invite link.
+- **Host** creates a room (optionally typing a name; otherwise they are Player 1) and shares the 4-letter code or invite link.
 - **Players** just enter the code. There are no names: players appear as Player 1, Player 2, ... in join order. The lobby updates live.
 - Host presses **Start vote**: the roster is locked in. Voting is one vote per player.
 - **New round** clears votes and re-reads the player list (late joiners get in). **Lobby** returns to the lobby. **End room** closes it for everyone.

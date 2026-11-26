@@ -192,7 +192,8 @@ async function createRoom() {
   let c, tries = 0;
   do { c = rand(4, ALPHABET); tries++; } while ((await db.get(`rooms/${c}`)) && tries < 20);
   await db.set(`rooms/${c}`, { host: pid, phase: 'lobby', round: 1, createdAt: Date.now() });
-  await db.set(`rooms/${c}/players/${pid}`, { name: 'Player 1', joinedAt: Date.now(), online: true });
+  const name = $('hostName').value.trim() || 'Player 1';
+  await db.set(`rooms/${c}/players/${pid}`, { name, joinedAt: Date.now(), online: true });
   enter(c, 'player');
 }
 
@@ -261,6 +262,7 @@ const withTimeout = (p) => Promise.race([
 $('createBtn').onclick = () => withTimeout(createRoom()).catch((e) => homeMsg(`Could not create room: ${e.message}`));
 $('joinBtn').onclick = () => withTimeout(joinRoom()).catch((e) => homeMsg(`Could not join: ${e.message}`));
 $('joinCode').addEventListener('input', (e) => { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z]/g, ''); });
+$('hostName').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('createBtn').click(); });
 $('joinCode').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('joinBtn').click(); });
 
 $('startBtn').onclick = startVote;
