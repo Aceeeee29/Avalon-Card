@@ -23,18 +23,18 @@ then visit `http://localhost:5173`. With no Firebase config the app runs in **de
 
 ## How a game works
 
-- **Host** creates a room (leave the name empty to use that device as a shared board only) and shares the 4-letter code or invite link.
-- **Players** enter the code and a name. The lobby updates live.
+- **Host** creates a room and shares the 4-letter code or invite link.
+- **Players** just enter the code. There are no names: players appear as Player 1, Player 2, ... in join order. The lobby updates live.
 - Host presses **Start vote**: the roster is locked in. Voting is one vote per player.
 - **New round** clears votes and re-reads the player list (late joiners get in). **Lobby** returns to the lobby. **End room** closes it for everyone.
-- Optional: *Hide votes until everyone has voted* keeps the tally secret until the last vote.
+- Votes are always secret: the tally and result stay hidden until everyone has voted.
 - Rules: APPROVED if Approve > Reject; REJECTED if Reject >= Approve once all votes are in.
 
 ## Data layout
 
 ```
 rooms/{code}
-  host, phase ('lobby'|'voting'), round, secret
+  host, phase ('lobby'|'voting'), round
   players/{pid}  { name, joinedAt, online }
   roster/{pid}   name          (snapshot taken when the round starts)
   votes/{pid}    'approve' | 'reject'

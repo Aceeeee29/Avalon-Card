@@ -129,8 +129,6 @@ function renderLobby(isHost) {
           ${isHost && p.id !== pid ? `<button class="x" data-remove="${p.id}" aria-label="Remove ${esc(p.name)}">&times;</button>` : ''}
         </li>`).join('')
     : '<li class="empty">No players yet</li>';
-  $('secretRow').hidden = !isHost;
-  $('secretChk').checked = !!room.secret;
   $('startBtn').hidden = !isHost;
   $('startBtn').disabled = list.length < 1;
   $('waitMsg').hidden = isHost;
@@ -148,7 +146,7 @@ function renderGame(isHost) {
   ids.forEach((id) => { if (votes[id] === 'approve') a++; else if (votes[id] === 'reject') r++; });
   const voted = a + r;
   const done = N > 0 && voted >= N;
-  const hidden = !!room.secret && !done;
+  const hidden = !done; // votes stay secret until everyone has voted
 
   // the result is the winning card; both overlap while nothing leads
   let show = 'both';
@@ -181,31 +179,33 @@ function renderGame(isHost) {
 }
 
 // ---------- actions ----------
-async function createRoom() {
-  homeMsg('');
-  const name = $('hostName').value.trim();
-  let c, tries = 0;
-  do { c = rand(4, ALPHABET); tries++; } while ((await db.get(`rooms/${c}`)) && tries < 20);
-  await db.set(`rooms/${c}`, { host: pid, phase: 'lobby', round: 1, secret: false, createdAt: Date.now() });
-  if (name) await db.set(`rooms/${c}/players/${pid}`, { name, joinedAt: Date.now(), online: true });
-  enter(c, name ? 'player' : 'watch');
+// Players have no names: they are "Player 1", "Player 2", ... in join order.
+function nextPlayerName(players) {
+  const used = new Set(Object.values(players || {}).filter((p) => p && p.name).map((p) => p.name));
+  let n = 1;
+  while (used.has(`Player ${n}`)) n++;
+  return `Player ${n}`;
 }
 
-async function joinRoom(watchOnly) {
+async function createRoom() {
+  homeMsg('');
+  let c, tries = 0;
+  do { c = rand(4, ALPHABET); tries++; } while ((await db.get(`rooms/${c}`)) && tries < 20);
+  await db.set(`rooms/${c}`, { host: pid, phase: 'lobby', round: 1, createdAt: Date.now() });
+  await db.set(`rooms/${c}/players/${pid}`, { name: 'Player 1', joinedAt: Date.now(), online: true });
+  enter(c, 'player');
+}
+
+async function joinRoom() {
   homeMsg('');
   const c = $('joinCode').value.trim().toUpperCase();
-  const name = $('joinName').value.trim();
   if (!/^[A-Z]{4}$/.test(c)) return homeMsg('Enter the 4-letter room code.');
-  if (!watchOnly && !name) return homeMsg('Enter your name to join.');
   const existing = await db.get(`rooms/${c}`);
   if (!existing) return homeMsg('No room with that code.');
-  if (!watchOnly) {
-    const taken = Object.entries(existing.players || {}).some(([id, p]) => id !== pid && p && p.name && p.name.toLowerCase() === name.toLowerCase());
-    if (taken) return homeMsg('That name is already taken in this room.');
-    const prev = existing.players && existing.players[pid];
-    await db.set(`rooms/${c}/players/${pid}`, { name, joinedAt: (prev && prev.joinedAt) || Date.now(), online: true });
-  }
-  enter(c, watchOnly ? 'watch' : 'player');
+  const prev = existing.players && existing.players[pid];
+  const name = (prev && prev.name) || nextPlayerName(existing.players);
+  await db.set(`rooms/${c}/players/${pid}`, { name, joinedAt: (prev && prev.joinedAt) || Date.now(), online: true });
+  enter(c, 'player');
 }
 
 function snapshotRoster() {
@@ -259,11 +259,9 @@ const withTimeout = (p) => Promise.race([
   new Promise((_, rej) => setTimeout(() => rej(new Error('No response from the database. Check databaseURL in firebase-config.js and that Realtime Database is created.')), 8000))
 ]);
 $('createBtn').onclick = () => withTimeout(createRoom()).catch((e) => homeMsg(`Could not create room: ${e.message}`));
-$('joinBtn').onclick = () => withTimeout(joinRoom(false)).catch((e) => homeMsg(`Could not join: ${e.message}`));
-$('watchBtn').onclick = () => withTimeout(joinRoom(true)).catch((e) => homeMsg(`Could not join: ${e.message}`));
+$('joinBtn').onclick = () => withTimeout(joinRoom()).catch((e) => homeMsg(`Could not join: ${e.message}`));
 $('joinCode').addEventListener('input', (e) => { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z]/g, ''); });
-$('joinName').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('joinBtn').click(); });
-$('hostName').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('createBtn').click(); });
+$('joinCode').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('joinBtn').click(); });
 
 $('startBtn').onclick = startVote;
 $('roundBtn').onclick = newRound;
@@ -271,7 +269,6 @@ $('lobbyBtn').onclick = backToLobby;
 $('exitBtn').onclick = exitRoom;
 $('copyBtn').onclick = copyInvite;
 $('codeChip').onclick = copyInvite;
-$('secretChk').onchange = (e) => db.set(path('secret'), e.target.checked);
 $('playerList').addEventListener('click', (e) => {
   const id = e.target.dataset && e.target.dataset.remove;
   if (id) db.update(path(), { [`players/${id}`]: null, [`roster/${id}`]: null, [`votes/${id}`]: null });
