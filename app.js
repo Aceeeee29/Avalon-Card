@@ -134,6 +134,8 @@ function renderLobby(isHost) {
           ${isHost && p.id !== pid ? `<button class="x" data-remove="${p.id}" aria-label="Remove ${esc(p.name)}">&times;</button>` : ''}
         </li>`).join('')
     : '<li class="empty">No players yet</li>';
+  $('namesRow').hidden = !isHost;
+  $('namesChk').checked = !!room.showNames;
   $('startBtn').hidden = !isHost;
   $('startBtn').disabled = list.length < 1;
   $('waitMsg').hidden = isHost;
@@ -176,28 +178,30 @@ function renderGame(isHost) {
   if (role !== 'player') status = done ? '' : 'Watching';
   else if (!inRoster) status = 'A round is in progress — you will join the next one.';
   else if (mine) status = 'Your vote is locked in.';
-  if (!done) {
-    const waiting = ids.filter((id) => !votes[id]).map((id) => roster[id]);
-    if (waiting.length && waiting.length <= 6) status += `${status ? ' ' : ''}Waiting on: ${waiting.join(', ')}`;
-  }
   $('status').textContent = status;
+
+  // Names: after everyone has voted -> who voted what.
+  // During the game (host option) -> who has voted yet, without showing which way.
+  const list = $('revealList');
+  const showDuring = !!room.showNames && !done && N > 0;
+  list.hidden = !(done || showDuring);
+  if (done) {
+    list.innerHTML = ids.map((id) => `<li class="${votes[id]}"><span class="dot2"></span>${esc(roster[id])}<b>${votes[id] === 'approve' ? 'Approve' : 'Reject'}</b></li>`).join('');
+  } else if (showDuring) {
+    list.innerHTML = ids.map((id) => `<li class="${votes[id] ? 'voted' : 'waiting'}"><span class="dot2"></span>${esc(roster[id])}<b>${votes[id] ? 'Voted' : 'Waiting'}</b></li>`).join('');
+  } else {
+    list.innerHTML = '';
+  }
 }
 
 // ---------- actions ----------
-// Players have no names: they are "Player 1", "Player 2", ... in join order.
-function nextPlayerName(players) {
-  const used = new Set(Object.values(players || {}).filter((p) => p && p.name).map((p) => p.name));
-  let n = 1;
-  while (used.has(`Player ${n}`)) n++;
-  return `Player ${n}`;
-}
-
 async function createRoom() {
   homeMsg('');
+  const name = $('hostName').value.trim();
+  if (!name) return homeMsg('Enter your name to create a room.');
   let c, tries = 0;
   do { c = rand(4, ALPHABET); tries++; } while ((await db.get(`rooms/${c}`)) && tries < 20);
   await db.set(`rooms/${c}`, { host: pid, phase: 'lobby', round: 1, createdAt: Date.now() });
-  const name = $('hostName').value.trim() || 'Player 1';
   await db.set(`rooms/${c}/players/${pid}`, { name, joinedAt: Date.now(), online: true });
   enter(c, 'player');
 }
@@ -206,10 +210,13 @@ async function joinRoom() {
   homeMsg('');
   const c = $('joinCode').value.trim().toUpperCase();
   if (!/^[A-Z]{4}$/.test(c)) return homeMsg('Enter the 4-letter room code.');
+  const name = $('joinName').value.trim();
+  if (!name) return homeMsg('Enter your name to join.');
   const existing = await db.get(`rooms/${c}`);
   if (!existing) return homeMsg('No room with that code.');
   const prev = existing.players && existing.players[pid];
-  const name = (prev && prev.name) || nextPlayerName(existing.players);
+  const taken = Object.entries(existing.players || {}).some(([id, p]) => id !== pid && p && p.name && p.name.toLowerCase() === name.toLowerCase());
+  if (taken) return homeMsg('That name is already taken in this room.');
   await db.set(`rooms/${c}/players/${pid}`, { name, joinedAt: (prev && prev.joinedAt) || Date.now(), online: true });
   enter(c, 'player');
 }
@@ -268,6 +275,7 @@ $('createBtn').onclick = () => withTimeout(createRoom()).catch((e) => homeMsg(`C
 $('joinBtn').onclick = () => withTimeout(joinRoom()).catch((e) => homeMsg(`Could not join: ${e.message}`));
 $('joinCode').addEventListener('input', (e) => { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z]/g, ''); });
 $('hostName').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('createBtn').click(); });
+$('joinName').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('joinBtn').click(); });
 $('joinCode').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('joinBtn').click(); });
 
 $('startBtn').onclick = startVote;
@@ -276,6 +284,7 @@ $('lobbyBtn').onclick = backToLobby;
 $('exitBtn').onclick = exitRoom;
 $('copyBtn').onclick = copyInvite;
 $('codeChip').onclick = copyInvite;
+$('namesChk').onchange = (e) => db.set(path('showNames'), e.target.checked);
 $('playerList').addEventListener('click', (e) => {
   const id = e.target.dataset && e.target.dataset.remove;
   if (id) db.update(path(), { [`players/${id}`]: null, [`roster/${id}`]: null, [`votes/${id}`]: null });

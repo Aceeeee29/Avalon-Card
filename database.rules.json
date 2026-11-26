@@ -5,6 +5,7 @@
         ".read": true,
         ".write": true,
         ".validate": "newData.hasChildren(['host', 'phase'])",
+        "showNames": { ".validate": "newData.isBoolean()" },
         "phase": { ".validate": "newData.val() === 'lobby' || newData.val() === 'voting'" },
         "votes": {
           "$pid": { ".validate": "newData.val() === 'approve' || newData.val() === 'reject'" }

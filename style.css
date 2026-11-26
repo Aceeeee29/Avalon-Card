@@ -25,6 +25,16 @@ input:focus { outline: 2px solid var(--gold); outline-offset: 1px; }
 button.primary { font: 700 1rem Georgia, serif; letter-spacing: .08em; color: #1a140a; background: linear-gradient(#e0c577, #b08a35); border: 0; border-radius: 8px; padding: 12px; cursor: pointer; }
 button.primary:disabled { opacity: .4; cursor: default; }
 .msg:not(:empty) { color: var(--red); }
+
+/* who voted what (shown after everyone has voted) */
+.reveal { list-style: none; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 420px; }
+.reveal li { display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; border: 1px solid #3a3224; background: #17150f; font-size: .9rem; }
+.reveal b { font-weight: 400; font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; opacity: .85; }
+.reveal .dot2 { width: 9px; height: 9px; border-radius: 50%; }
+.reveal .voted { border-color: #5a4a22; } .reveal .voted .dot2 { background: var(--gold); } .reveal .voted b { color: var(--gold); }
+.reveal .waiting { opacity: .55; } .reveal .waiting .dot2 { background: #555; }
+.reveal .approve { border-color: #2f5a3d; } .reveal .approve .dot2 { background: var(--green); } .reveal .approve b { color: var(--green); }
+.reveal .reject { border-color: #6a2f2a; }  .reveal .reject .dot2 { background: var(--red); }   .reveal .reject b { color: var(--red); }
 button.link { font: inherit; background: none; border: 0; color: #9d916f; text-decoration: underline; cursor: pointer; padding: 4px; }
 .note { color: #8a8272; font-size: .9rem; }
 .msg { color: var(--red); min-height: 1.2em; font-size: .9rem; }
